@@ -1,0 +1,6 @@
+global:
+  stage: local
+  acme:
+    domain: steadops.local.steadforce.com
+
+resources: ~

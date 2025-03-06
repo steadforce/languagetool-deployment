@@ -1,0 +1,19 @@
+global:
+  istio:
+    ingressGateway:
+      namespace: istio-ingress
+
+image:
+  repository: erikvl87/languagetool
+  tag: 6.0-dockerupdate-3
+
+languagetool:
+  subDomain: languagetool
+
+resources:
+  limits:
+    cpu: "1"
+    memory: "2048Mi"
+  requests:
+    cpu: "10m"
+    memory: "1024Mi"

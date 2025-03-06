@@ -1,0 +1,21 @@
+{{- if .Capabilities.APIVersions.Has "networking.istio.io/v1beta1" }}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: languagetool
+spec:
+  gateways:
+  - {{ .Values.global.istio.ingressGateway.namespace }}/{{ .Values.languagetool.subDomain }}-acme-gateway
+  hosts:
+  - {{ .Values.languagetool.subDomain }}.{{ .Values.global.acme.domain }}
+  http:
+  - headers:
+      response:
+        set:
+          strict-transport-security: max-age=15724800
+    route:
+    - destination:
+        host: languagetool
+        port:
+          number: 80
+{{- end }}

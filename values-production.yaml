@@ -1,0 +1,4 @@
+global:
+  stage: production
+  acme:
+    domain: k8s01.steadforce.com

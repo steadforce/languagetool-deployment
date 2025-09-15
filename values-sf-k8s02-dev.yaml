@@ -1,0 +1,4 @@
+global:
+  stage: development
+  acme:
+    domain: dev.k8s02.steadforce.com

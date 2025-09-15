@@ -17,8 +17,39 @@ Or with output in JUnit format:
 
 ## Render resource locally
 
+### local
+
 ```
  helm template -n languagetool --release-name languagetool --include-crds --skip-tests \
   -a networking.istio.io/v1beta1 \
-  -f values-local.yaml --output-dir _local .
+  -f values-local.yaml \
+  --output-dir _local/local .
+```
+
+### dev 01
+
+```
+ helm template -n languagetool --release-name languagetool --include-crds --skip-tests \
+  -a networking.istio.io/v1beta1 \
+  -f values-development.yaml \
+  --output-dir _local/dev01 .
+```
+
+### dev 02
+
+```
+ helm template -n languagetool --release-name languagetool --include-crds --skip-tests \
+  -a networking.istio.io/v1beta1 \
+  -f values-development.yaml \
+  -f values-sf-k8s02-dev.yaml \
+  --output-dir _local/dev02 .
+```
+
+### prod 01
+
+```
+ helm template -n languagetool --release-name languagetool --include-crds --skip-tests \
+  -a networking.istio.io/v1beta1 \
+  -f values-production.yaml \
+  --output-dir _local/prod01 .
 ```

@@ -9,6 +9,7 @@ image:
 
 languagetool:
   subDomain: languagetool
+  storageClassName: nfs1
 
 resources:
   limits:

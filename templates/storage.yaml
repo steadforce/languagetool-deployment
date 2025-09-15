@@ -3,7 +3,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: languagetool-ngrams
 spec:
-  storageClassName: nfs1
+  storageClassName: {{ .Values.languagetool.storageClassName }}
   accessModes:
     - ReadWriteOnce
   resources:

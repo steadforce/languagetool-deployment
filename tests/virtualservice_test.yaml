@@ -1,0 +1,103 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema.json
+suite: languagetool virtual service host and gateway per stage
+templates:
+  - &virtualServiceTemplate templates/virtualservice.yaml
+release:
+  name: language-tool
+  namespace: language-tool
+tests:
+  - it: omits the virtual service without the istio networking API
+    values:
+      - &developmentValuesFile ../values-development.yaml
+    capabilities:
+      apiVersions: []
+    asserts:
+      - hasDocuments:
+          count: 0
+
+  - it: renders the steadops.local host on local
+    values:
+      - &localValuesFile ../values-local.yaml
+    capabilities: &istioCapabilities
+      apiVersions:
+        - networking.istio.io/v1beta1
+    asserts:
+      - &virtualServiceKindAssert
+        isKind:
+          of: VirtualService
+      - equal:
+          path: spec.hosts
+          value:
+            - languagetool.steadops.local.steadforce.com
+  - it: renders the dev.k8s01 host on development
+    values:
+      - *developmentValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - *virtualServiceKindAssert
+      - equal:
+          path: spec.hosts
+          value:
+            - languagetool.dev.k8s01.steadforce.com
+  - it: renders the k8s01 host on production
+    values:
+      - &productionValuesFile ../values-production.yaml
+    capabilities: *istioCapabilities
+    asserts:
+      - *virtualServiceKindAssert
+      - equal:
+          path: spec.hosts
+          value:
+            - languagetool.k8s01.steadforce.com
+
+  - it: uses the acme gateway in the default istio-ingress namespace
+    values:
+      - *productionValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - equal:
+          path: spec.gateways
+          value:
+            - istio-ingress/languagetool-acme-gateway
+  - it: uses the acme gateway in the ingress gateway namespace set by Argo CD
+    values:
+      - *developmentValuesFile
+    set:
+      global.istio.ingressGateway.namespace: istio-gateway
+    capabilities: *istioCapabilities
+    asserts:
+      - equal:
+          path: spec.gateways
+          value:
+            - istio-gateway/languagetool-acme-gateway
+
+  - it: routes to the languagetool service on port 80
+    values:
+      - *productionValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - equal:
+          path: spec.http[0].route[0].destination
+          value:
+            host: languagetool
+            port:
+              number: 80
+
+  - it: matches the local virtual service snapshot
+    values:
+      - *localValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - matchSnapshot: {}
+  - it: matches the development virtual service snapshot
+    values:
+      - *developmentValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - matchSnapshot: {}
+  - it: matches the production virtual service snapshot
+    values:
+      - *productionValuesFile
+    capabilities: *istioCapabilities
+    asserts:
+      - matchSnapshot: {}

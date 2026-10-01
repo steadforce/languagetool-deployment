@@ -1,0 +1,73 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema.json
+suite: languagetool deployment image and resources per stage
+templates:
+  - &deploymentTemplate templates/deployment.yaml
+release:
+  name: language-tool
+  namespace: language-tool
+tests:
+  - it: uses the erikvl87/languagetool image on local
+    values:
+      - &localValuesFile ../values-local.yaml
+    asserts:
+      - &imageAssert
+        matchRegex:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].image
+          pattern: ^erikvl87/languagetool:[^:]+$
+  - it: uses the erikvl87/languagetool image on development
+    values:
+      - &developmentValuesFile ../values-development.yaml
+    asserts:
+      - *imageAssert
+  - it: uses the erikvl87/languagetool image on production
+    values:
+      - &productionValuesFile ../values-production.yaml
+    asserts:
+      - *imageAssert
+
+  - it: omits container resources on local
+    values:
+      - *localValuesFile
+    asserts:
+      - isNullOrEmpty:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].resources
+  - it: sets cpu and memory limits and requests on development
+    values:
+      - *developmentValuesFile
+    asserts:
+      - &cpuLimitAssert
+        exists:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].resources.limits.cpu
+      - &memoryLimitAssert
+        exists:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].resources.limits.memory
+      - &cpuRequestAssert
+        exists:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].resources.requests.cpu
+      - &memoryRequestAssert
+        exists:
+          path: spec.template.spec.containers[?(@.name == "languagetool")].resources.requests.memory
+  - it: sets cpu and memory limits and requests on production
+    values:
+      - *productionValuesFile
+    asserts:
+      - *cpuLimitAssert
+      - *memoryLimitAssert
+      - *cpuRequestAssert
+      - *memoryRequestAssert
+
+  - it: matches the local deployment snapshot
+    values:
+      - *localValuesFile
+    asserts:
+      - matchSnapshot: {}
+  - it: matches the development deployment snapshot
+    values:
+      - *developmentValuesFile
+    asserts:
+      - matchSnapshot: {}
+  - it: matches the production deployment snapshot
+    values:
+      - *productionValuesFile
+    asserts:
+      - matchSnapshot: {}

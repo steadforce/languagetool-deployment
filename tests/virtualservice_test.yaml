@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema.json
 suite: languagetool virtual service host and gateway per stage
 templates:
-  - &virtualServiceTemplate templates/virtualservice.yaml
+  - templates/virtualservice.yaml
 release:
   name: language-tool
   namespace: language-tool

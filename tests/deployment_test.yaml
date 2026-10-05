@@ -1,7 +1,7 @@
 # yaml-language-server: $schema=https://raw.githubusercontent.com/helm-unittest/helm-unittest/main/schema.json
 suite: languagetool deployment image and resources per stage
 templates:
-  - &deploymentTemplate templates/deployment.yaml
+  - templates/deployment.yaml
 release:
   name: language-tool
   namespace: language-tool
